@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 30m
-  url: "https://github.com/elibrody/prod-home-k3s"
+  url: "https://github.com/BitByBitConsulting/prod-home-k3s"
   ref:
     branch: "main"
   ignore: |
