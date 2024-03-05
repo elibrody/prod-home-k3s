@@ -30,11 +30,11 @@ spec:
       className: "internal"
       annotations:
         cert-manager.io/cluster-issuer: "letsencrypt-production"
-        gethomepage.dev/enabled: "true"
-        gethomepage.dev/name: "Weave GitOps"
-        gethomepage.dev/group: "Observability"
-        gethomepage.dev/icon: "https://www.weave.works/assets/favicon/favicon_300px.png"
-        gethomepage.dev/description: "Open source developer platform."
+#        gethomepage.dev/enabled: "true"
+#        gethomepage.dev/name: "Weave GitOps"
+#        gethomepage.dev/group: "Observability"
+#        gethomepage.dev/icon: "https://www.weave.works/assets/favicon/favicon_300px.png"
+#        gethomepage.dev/description: "Open source developer platform."
       hosts:
         - host: &host "gitops.${SECRET_DOMAIN}"
           paths:
