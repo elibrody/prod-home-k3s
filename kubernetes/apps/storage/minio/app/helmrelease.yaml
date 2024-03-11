@@ -7,7 +7,7 @@ metadata:
 spec:
   dependsOn:
     - name: csi-driver-nfs
-      namespace: flux-system
+      namespace: system
   interval: 30m
   chart:
     spec:
@@ -31,7 +31,7 @@ spec:
     controllers:
       main:
         labels:
-          nfsMount: "false"
+          nfsMount: "true"
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
