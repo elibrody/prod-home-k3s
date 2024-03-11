@@ -131,7 +131,6 @@ spec:
     persistence:
       data:
         enabled: true
-        type: localPath
-        hostPath: /mnt/tmp/minio
-        globalMounts:
-          - path: /data
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
