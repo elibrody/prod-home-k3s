@@ -5,6 +5,9 @@ kind: HelmRelease
 metadata:
   name: &app minio
 spec:
+  dependsOn:
+    - name: csi-driver-nfs
+      namespace: flux-system
   interval: 30m
   chart:
     spec:
