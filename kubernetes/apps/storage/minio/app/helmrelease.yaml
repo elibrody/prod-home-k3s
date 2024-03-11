@@ -28,7 +28,7 @@ spec:
     controllers:
       main:
         labels:
-          nfsMount: "true"
+          nfsMount: "false"
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
