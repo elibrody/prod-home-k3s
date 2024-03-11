@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/common-3.0.1/charts/library/common/values.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
@@ -9,12 +9,11 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-  maxHistory: 2
   install:
     remediation:
       retries: 3
@@ -22,20 +21,18 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  uninstall:
-    keepHistory: false
   values:
     controllers:
-      main:
+      minio:
         labels:
           nfsMount: "false"
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
               repository: quay.io/minio/minio
-              tag: RELEASE.2024-02-26T09-33-48Z
+              tag: RELEASE.2024-03-10T02-53-48Z
             env:
               MINIO_API_CORS_ALLOW_ORIGIN: https://minio.${SECRET_DOMAIN},https://s3.${SECRET_DOMAIN}
               MINIO_BROWSER_REDIRECT_URL: https://minio.${SECRET_DOMAIN}
@@ -77,15 +74,16 @@ spec:
               limits:
                 memory: 3Gi
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: 9001
           s3:
             port: 9000
     serviceMonitor:
-      main:
-        enabled: true
+      app:
+        serviceName: *app
         endpoints:
           - port: s3
             scheme: http
@@ -93,8 +91,7 @@ spec:
             interval: 1m
             scrapeTimeout: 10s
     ingress:
-      main:
-        enabled: true
+      app:
         className: internal
         annotations:
           nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -105,7 +102,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: http
         tls:
           - hosts:
@@ -114,7 +111,7 @@ spec:
         enabled: true
         className: external
         annotations:
-          external-dns.alpha.kubernetes.io/target: network.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           nginx.ingress.kubernetes.io/configuration-snippet: |
             more_set_headers "Host $host";
             more_set_headers "X-Forwarded-For $remote_addr"
@@ -123,7 +120,7 @@ spec:
             paths:
               - path: /
                 service:
-                  name: main
+                  identifier: app
                   port: s3
         tls:
           - hosts:
@@ -132,7 +129,7 @@ spec:
       data:
         enabled: false
         type: nfs
-        server: 192.168.1.111
-        path: /Backups/minio/data
+        server: ${NAS_IP:=temp}
+        path: ${SECRET_NFS_MINIO:=temp}
         globalMounts:
           - path: /data
