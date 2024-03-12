@@ -48,6 +48,13 @@ tasks:
     preconditions:
       - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_INVENTORY_FILE}}" }
 
+  reboot:
+    desc: reboot all the k8s nodes
+    deps: ["deps"]
+    cmd: "{{.VIRTUAL_ENV}}/bin/ansible kubernetes --inventory {{.ANSIBLE_INVENTORY_FILE}} -a '/usr/bin/systemctl reboot' --become"
+    preconditions:
+      - { msg: "Missing Ansible inventory file", sh: "test -f {{.ANSIBLE_INVENTORY_FILE}}" }
+
   poweroff:
     desc: Shutdown all the k8s nodes
     deps: ["deps"]
