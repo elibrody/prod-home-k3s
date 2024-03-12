@@ -6,7 +6,7 @@ metadata:
   name: &app minio
 spec:
   dependsOn:
-    - name: flux-system-csi-driver-nfs
+    - name: csi-driver-nfs
       namespace: flux-system
   interval: 30m
   chart:
