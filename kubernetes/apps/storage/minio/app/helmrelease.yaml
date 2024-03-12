@@ -24,8 +24,8 @@ spec:
   values:
     controllers:
       minio:
-        labels:
-          nfsMount: "true"
+#        labels:
+#          nfsMount: "true"
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -132,4 +132,3 @@ spec:
         existingClaim: minio-csi
 #        globalMounts:
 #          - path: /data
-#
