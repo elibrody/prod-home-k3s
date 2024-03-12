@@ -1,81 +1,68 @@
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2beta2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: bitwarden-secrets-manager
+  name: &app bitwarden
+  namespace: kube-system
 spec:
   interval: 5m
   chart:
     spec:
       chart: app-template
-      version: 2.6.0
+      version: 3.0.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+      interval: 5m
   maxHistory: 2
   install:
+    createNamespace: true
     remediation:
       retries: 3
   upgrade:
     cleanupOnFail: true
     remediation:
       retries: 3
-  uninstall:
-    keepHistory: false
   values:
     controllers:
-      main:
-        labels:
-          vector.dev/exclude: "true"
-        annotations:
-          reloader.stakater.com/auto: "true"
+      bitwarden:
         containers:
-          main:
+          app:
             image:
-              repository: ghcr.io/ripplefcl/bws-cache
-              tag: 1.0.0@sha256:84f278595e2e32ba79727ed620e218381c36351137f5c4d5b7b8e0303a00e128
+              repository: ghcr.io/larivierec/bitwarden-cli
+              tag: 2024.2.1@sha256:5b6bc0217c552827715ae3df9d081cc7e8232edddb814687a083b26746807d79
             env:
-              SECRET_TTL: 600
-              DEBUG: "true"
-              ORG_ID:
-                valueFrom:
-                  secretKeyRef:
-                    name: bws-secret
-                    key: ORG_ID
-            # probes:
-            #   liveness:
-            #     enabled: false
-            # #     custom: false
-            # #     spec:
-            # #       httpGet:
-            # #         path: /heartbeat
-            # #         port: 5000
-            # #       initialDelaySeconds: 15
-            # #       periodSeconds: 30
-            # #       failureThreshold: 3
-            #   readiness:
-            #     enabled: false
-            # #     custom: true
-            # #     spec:
-            # #       httpGet:
-            # #         path: /health
-            # #         port: 5000
-            # #       initialDelaySeconds: 15
-            #   startup:
-            #     enabled: false
-            securityContext: &securityContext
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
-            resources: &resources
+              BW_CLIENTID: ${BW_CLIENTID}
+              BW_CLIENTSECRET: ${BW_CLIENTSECRET}
+              BW_PASSWORD: ${BW_PASSWORD}
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      [
+                        "sh",
+                        "-c",
+                        "curl -X POST -s http://127.0.0.1:8087/sync | jq -e '.success == true'",
+                      ]
+                  timeoutSeconds: 5
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            resources:
               requests:
-                cpu: 10m
-                memory: 10Mi
+                memory: 256Mi
+                cpu: 100m
               limits:
-                memory: 100Mi
+                memory: 512Mi
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
-            port: 5000
+            port: 8087
