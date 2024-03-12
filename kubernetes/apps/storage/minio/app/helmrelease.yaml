@@ -129,7 +129,7 @@ spec:
     persistence:
       data:
         enabled: true
-        existingClaim: storage/minio-csi-1
+        existingClaim: storage/minio-csi-2
 #        mountPath: /data
 #        globalMounts:
 #          - path: /data
