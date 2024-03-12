@@ -127,9 +127,13 @@ spec:
               - *s3Host
 
     persistence:
-      mnt:
+      config:
+        enabled: false
         type: hostPath
-        hostPath: /tmp/minio/
-        hostPathType: Directory
-        globalMounts:
-          - path: /data
+        storageClass: local-path
+        existingClaim: minio-local-path-pvc
+        accessMode: ReadWriteMany
+#        hostPath: /tmp/minio/
+#        hostPathType: Directory
+#        globalMounts:
+#          - path: /data
