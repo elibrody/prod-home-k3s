@@ -125,9 +125,11 @@ spec:
         tls:
           - hosts:
               - *s3Host
+
     persistence:
-      data:
-        enabled: true
-        existingClaim: minio-local-path-pvc
+      mnt:
+        type: hostPath
+        hostPath: /tmp/minio/data
+        hostPathType: Directory
         globalMounts:
           - path: /data
