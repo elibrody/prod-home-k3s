@@ -129,7 +129,7 @@ spec:
     persistence:
       mnt:
         type: hostPath
-        hostPath: /tmp/minio/data
+        hostPath: /tmp/minio/
         hostPathType: Directory
         globalMounts:
           - path: /data
