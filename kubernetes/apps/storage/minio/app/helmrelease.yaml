@@ -1,134 +1,123 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/common-1.0.6/charts/library/common/values.schema.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: &app minio
+  name: minio
+  namespace: ${MINIO_NAMESPACE:=minio}
 spec:
-  interval: 30m
+  interval: ${HELM_RELEASE_INTERVAL:=24h}
   chart:
     spec:
+      # renovate: registryUrl=https://bjw-s.github.io/helm-charts/
       chart: app-template
-      version: 1.0.6
+      version: 1.3.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 3
   values:
-    controllers:
-      minio:
-        labels:
-          nfsMount: "true"
-        annotations:
-          reloader.stakater.com/auto: "true"
-        containers:
-          app:
-            image:
-              repository: quay.io/minio/minio
-              tag: RELEASE.2024-03-10T02-53-48Z
-            env:
-              MINIO_API_CORS_ALLOW_ORIGIN: https://minio.${SECRET_DOMAIN},https://s3.${SECRET_DOMAIN}
-              MINIO_BROWSER_REDIRECT_URL: https://minio.${SECRET_DOMAIN}
-              MINIO_PROMETHEUS_JOB_ID: minio
-              MINIO_PROMETHEUS_URL: https://prometheus.${SECRET_PRIMARY_DOMAIN}
-              MINIO_PROMETHEUS_AUTH_TYPE: public
-              MINIO_SERVER_URL: https://s3.${SECRET_DOMAIN}
-              MINIO_UPDATE: "off"
-            envFrom:
-              - secretRef:
-                  name: *app
-            args:
-              - server
-              - /data
-              - --console-address
-              - :9001
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /minio/health/live
-                    port: 9000
-                  initialDelaySeconds: 30
-                  periodSeconds: 30
-                  timeoutSeconds: 10
-                  failureThreshold: 6
-              readiness: *probes
-              startup:
-                enabled: false
-            securityContext:
-              privileged: true
-              runAsUser: 99
-            resources:
-              requests:
-                memory: 100Mi
-                cpu: 100m
-              limits:
-                memory: 3Gi
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2023-01-31T02-24-19Z
+    env:
+      TZ: ${TIMEZONE}
+      MINIO_UPDATE: "off"
+      # TODO: Add back in once Prometheus is setup - @russell.green
+      # MINIO_PROMETHEUS_URL: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+      # MINIO_PROMETHEUS_JOB_ID: minio
+      # MINIO_PROMETHEUS_AUTH_TYPE: "public"
+      MINIO_ROOT_USER: ${MINIO_USER:=admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:=changeme}
+      MINIO_BROWSER_REDIRECT_URL: https://minio.${PRIMARY_DOMAIN}/
+      MINIO_SERVER_URL: https://s3.${PRIMARY_DOMAIN}/
+      CONSOLE_MINIO_SERVER: https://minio.${PRIMARY_DOMAIN}
+      MINIO_DOMAIN: "https://s3.${PRIMARY_DOMAIN}"
+      MINIO_API_CORS_ALLOW_ORIGIN: https://minio.${PRIMARY_DOMAIN},https://s3.${PRIMARY_DOMAIN}
+    args: ["server", "/data", "--console-address", ":9001"]
     service:
-      app:
-        controller: *app
+      main:
+        enabled: true
         ports:
           http:
-            port: 9001
-          s3:
-            port: 9000
+            port: &console-port 9001
+          api:
+            enabled: true
+            port: &api-port 9000
     serviceMonitor:
-      app:
-        serviceName: *app
-        endpoints:
-          - port: s3
-            scheme: http
-            path: /minio/v2/metrics/cluster
-            interval: 1m
-            scrapeTimeout: 10s
+      main:
+        # TODO: Enable when prometheus is installed - @russell.green
+        enabled: false
+    probes:
+      liveness: &probes
+        enabled: true
+        custom: true
+        spec:
+          httpGet:
+            path: /minio/health/live
+            port: *api-port
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+      readiness: *probes
+      startup:
+        enabled: false
     ingress:
-      app:
-        className: internal
-        annotations:
-          nginx.ingress.kubernetes.io/configuration-snippet: |
-            more_set_headers "Host $host";
-            more_set_headers "X-Forwarded-For $remote_addr"
-        hosts:
-          - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts:
-              - *host
-      api:
+      main:
         enabled: true
-        className: external
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          nginx.ingress.kubernetes.io/configuration-snippet: |
-            more_set_headers "Host $host";
-            more_set_headers "X-Forwarded-For $remote_addr"
+          nginx.ingress.kubernetes.io/custom-http-errors: "418"
+          hajimari.io/enable: "true"
+          hajimari.io/icon: mdi:pail
+          hajimari.io/group: "storage"
         hosts:
-          - host: &s3Host s3.${SECRET_DOMAIN}
+          - host: &console-host "{{ .Release.Name }}.${PRIMARY_DOMAIN}"
             paths:
               - path: /
+                pathType: Prefix
                 service:
-                  identifier: app
-                  port: s3
+                  port: *console-port
         tls:
           - hosts:
-              - *s3Host
+              - *console-host
+      s3:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/custom-http-errors: "418"
+          nginx.ingress.kubernetes.io/proxy-connect-timeout: "180"
+          nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+          nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+          nginx.ingress.kubernetes.io/configuration-snippet: |
+            chunked_transfer_encoding off;
+          hajimari.io/enable: "false"
+        hosts:
+          - host: &api-host s3.${PRIMARY_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  port: *api-port
+        tls:
+          - hosts:
+              - *api-host
+    podSecurityContext:
+      runAsUser: 0
+      runAsGroup: 0
+      fsGroup: 0
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 100
     persistence:
-      data:
+      config:
         enabled: true
+        existingClaim: nfs-provision
         mountPath: /data
-        storageClass: nfs-provision
-        size: 20Gi
-        retain: true
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 750Mi
