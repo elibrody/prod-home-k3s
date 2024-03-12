@@ -126,7 +126,7 @@ spec:
           - hosts:
               - *s3Host
     persistence:
-      config:
+      data:
         enabled: true
         mountPath: /data
         storageClass: nfs-provision
