@@ -24,8 +24,8 @@ spec:
   values:
     controllers:
       minio:
- #       labels:
- #         nfsMount: "true"
+        labels:
+          nfsMount: "true"
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -129,9 +129,6 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: minio-local-path-pvc
-        mountPath: /data
-#        hostPath: /tmp/minio/
-#        hostPathType: Directory
-#        globalMounts:
-#          - path: /data
+        existingClaim: minio-csi
+        globalMounts:
+          - path: /data

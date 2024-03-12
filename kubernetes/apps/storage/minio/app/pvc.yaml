@@ -1,12 +1,13 @@
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: minio-local-path-pvc
-  namespace: default
+  name: minio-csi
+  namespace: system
 spec:
   accessModes:
-    - ReadWriteOnce
-  storageClassName: local-path
+    - ReadWriteMany
+  storageClassName: nfs-provision
   resources:
     requests:
-      storage: 2Gi
+      storage: 500Gi
