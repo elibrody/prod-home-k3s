@@ -12,3 +12,9 @@ resources:
   - ./openebs.yaml
   - ./stakater.yaml
   - ./external-secrets.yaml
+  - ./csi-driver-nfs.yaml
+  - ./csi-driver-smb.yaml
+  - ./nfs-subdir-external-provisioner.yaml
+  - ./mojo2600.yaml
+  - ./longhorn.yaml
+  - ./weave-gitops.yaml
