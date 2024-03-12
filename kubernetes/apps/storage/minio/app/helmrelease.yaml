@@ -7,7 +7,7 @@ metadata:
 spec:
   dependsOn:
     - name: csi-driver-nfs
-      namespace: system
+      namespace: flux-system
   interval: 30m
   chart:
     spec:
