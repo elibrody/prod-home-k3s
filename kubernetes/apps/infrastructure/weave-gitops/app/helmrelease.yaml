@@ -32,12 +32,6 @@ spec:
     ingress:
       enabled: true
       className: internal
-      annotations:
-        gethomepage.dev/enabled: "true"
-        gethomepage.dev/group: Infrastructure
-        gethomepage.dev/name: Weave-gitops
-        gethomepage.dev/icon: https://raw.githubusercontent.com/joryirving/home-ops/main/.docs/icons/weave.png
-        gethomepage.dev/description: Flux Dashboard
       hosts:
         - host: &host "gitops.${SECRET_DOMAIN}"
           paths:
@@ -52,9 +46,6 @@ spec:
       enabled: true
     rbac:
       create: true
-      additionalRules:
-        - apiGroups: [ "infra.contrib.fluxcd.io" ]
-          resources: [ "terraforms" ]
-          verbs: [ "get", "list", "patch" ]
+      impersonationResourceNames: ["admin"]
     podAnnotations:
       secret.reloader.stakater.com/reload: cluster-user-auth
