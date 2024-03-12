@@ -127,9 +127,9 @@ spec:
               - *s3Host
 
     persistence:
-      config:
+      data:
         enabled: true
         existingClaim: minio-csi
-        mountPath: /data
+#        mountPath: /data
 #        globalMounts:
 #          - path: /data
