@@ -5,7 +5,7 @@ metadata:
 provisioner: smb.csi.k8s.io
 parameters:
   # On Windows, "*.default.svc.cluster.local" could not be recognized by csi-proxy
-  source: //smb.${SECRET_DOMAIN}/k3s
+  source: //192.168.1.111/k3s
   subDir: ${pvc.metadata.namespace}-${pvc.metadata.name}
   # if csi.storage.k8s.io/provisioner-secret is provided, will create a sub directory
   # with PV name under source
@@ -14,6 +14,7 @@ parameters:
   csi.storage.k8s.io/node-stage-secret-name: "smb-secret"
   csi.storage.k8s.io/node-stage-secret-namespace: kube-system
 volumeBindingMode: Immediate
+onDelete: archive
 mountOptions:
   - dir_mode=0777
   - file_mode=0777
