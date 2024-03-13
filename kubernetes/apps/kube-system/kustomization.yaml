@@ -7,3 +7,4 @@ resources:
   - ./metrics-server/ks.yaml
   - ./reloader/ks.yaml
   - ./nfs-subdir-external-provisioner/ks.yaml
+  - ./csi-driver-smb/ks.yaml
