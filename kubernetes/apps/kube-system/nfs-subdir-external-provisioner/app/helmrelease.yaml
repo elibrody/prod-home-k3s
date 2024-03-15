@@ -6,6 +6,7 @@ metadata:
   #namespace: kube-system
   labels:
     kustomize.toolkit.fluxcd.io/substitute: "disabled"
+    reloader.stakater.com/auto: "true"
 spec:
   interval: 5m
   chart:
