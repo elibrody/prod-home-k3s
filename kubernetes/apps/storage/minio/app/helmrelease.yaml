@@ -137,7 +137,7 @@ spec:
     persistence:
       data:
         enabled: true
-        existingClaim: minio-csi-smb-3
+        existingClaim: minio-csi-smb-4
 #        mountPath: /data
 #        globalMounts:
 #          - path: /data
