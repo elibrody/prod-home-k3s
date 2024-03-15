@@ -140,7 +140,7 @@ spec:
     persistence:
       data:
         enabled: true
-        existingClaim: minio-csi-nfs-8
+        existingClaim: minio-csi-nfs-7
 #        mountPath: /data
 #        globalMounts:
 #          - path: /data
