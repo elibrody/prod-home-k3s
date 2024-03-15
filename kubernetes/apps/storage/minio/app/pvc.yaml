@@ -2,12 +2,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: minio-csi-nfs-6
+  name: minio-csi-smb-6
   namespace: storage
 spec:
+  storageClassName: smb
   accessModes:
     - ReadWriteMany
-  storageClassName: nfs-provision
+  storageClassName: smb
   resources:
     requests:
       storage: 50Gi
