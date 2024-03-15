@@ -31,7 +31,7 @@ spec:
     replicaCount: 2
     nfs:
       server: "192.168.1.111"
-      path: "/mnt/user/k3s"
+      path: "/mnt/user/k3s/nfs"
     storageClass:
       defaultClass: false
       name: nfs-provision
