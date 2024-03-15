@@ -179,8 +179,7 @@ spec:
 
     customLabels: {}
     ## Collection of annotations to add to all the pods
-    podAnnotations:
-      reloader.stakater.com/auto: "true"
+    podAnnotations: reloader.stakater.com/auto: "true"
     ## Collection of labels to add to all the pods
     podLabels: {}
     ## Leverage a PriorityClass to ensure your pods survive resource shortages
