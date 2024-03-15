@@ -14,12 +14,12 @@ parameters:
   csi.storage.k8s.io/node-stage-secret-name: "smb-secret"
   csi.storage.k8s.io/node-stage-secret-namespace: kube-system
 volumeBindingMode: Immediate
-onDelete: archive
+#onDelete: archive
 mountOptions:
   - dir_mode=0777
   - file_mode=0777
-  - uid=1001
-  - gid=1001
+  - uid=0
+  - gid=0
   - noperm
   - mfsymlinks
   - cache=strict
