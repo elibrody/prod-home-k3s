@@ -138,10 +138,15 @@ spec:
           - hosts:
               - *s3Host
 
+#    persistence:
+#      data:
+#        enabled: true
+#        existingClaim: minio-csi-nfs-7
     persistence:
       data:
         enabled: true
-        existingClaim: minio-csi-nfs-7
-#        mountPath: /data
-#        globalMounts:
-#          - path: /data
+        type: nfs
+        server: 192.168.1.111
+        path: /mnt/user/k3s/nfs/minio
+        globalMounts:
+          - path: /data
