@@ -76,7 +76,7 @@ spec:
       main:
         enabled: true
     ingress:
-      main:
+      app:
         enabled: true
         className: external
         annotations:
