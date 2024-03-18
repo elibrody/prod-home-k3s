@@ -23,11 +23,11 @@ spec:
       retries: 3
   values:
     controllers:
-      echo-server:
+      main:
         replicas: 1
         strategy: RollingUpdate
         containers:
-          app:
+          main:
             image:
               repository: ghcr.io/mendhak/http-https-echo
               tag: 31
@@ -89,17 +89,31 @@ spec:
             path: /metrics
             interval: 1m
             scrapeTimeout: 10s
-    ingress:
-      app:
+ingress:
+      main:
+        enabled: true
         className: external
         annotations:
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+          external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
         hosts:
-          - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - host: &host "{{ .Release.Name }}-external.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
-                  identifier: app
+                  name: main
+                  port: http
+        tls:
+          - hosts:
+              - *host
+      internal:
+        enabled: true
+        className: internal
+        hosts:
+          - host: &host "{{ .Release.Name }}-internal.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  name: main
                   port: http
         tls:
           - hosts:
