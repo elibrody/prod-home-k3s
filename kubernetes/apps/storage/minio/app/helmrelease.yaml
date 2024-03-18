@@ -148,5 +148,10 @@ spec:
         type: nfs
         server: 192.168.1.111
         path: /mnt/user/k3s/nfs/minio
+        mountOptions:
+          - nfsvers=4
+          - nconnect=8
+          - hard
+          - noatime
         globalMounts:
           - path: /data
