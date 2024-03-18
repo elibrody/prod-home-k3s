@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: cloudflared
+  name: &app cloudflared
 spec:
   interval: 30m
   chart:
@@ -29,7 +29,7 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          main:
+          app:
             image:
               repository: docker.io/cloudflare/cloudflared
               tag: 2024.2.1
@@ -83,13 +83,20 @@ spec:
             runAsGroup: 65534
             runAsNonRoot: true
     service:
-      main:
+      app:
+        controller: *app
         ports:
           http:
             port: *port
     serviceMonitor:
-      main:
-        enabled: true
+      app:
+        serviceName: *app
+        endpoints:
+          - port: http
+            scheme: http
+            path: /metrics
+            interval: 1m
+            scrapeTimeout: 10s
     persistence:
       config:
         enabled: true
