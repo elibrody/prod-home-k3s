@@ -45,16 +45,16 @@ spec:
 #              MINIO_PROMETHEUS_AUTH_TYPE: public
               MINIO_SERVER_URL: https://s3.${SECRET_DOMAIN}
               MINIO_UPDATE: "off"
-#              MINIO_ROOT_USER:
-#                valueFrom:
-#                  secretKeyRef:
-#                    name: minio
-#                    key: root-user
-#              MINIO_ROOT_PASSWORD:
-#                valueFrom:
-#                  secretKeyRef:
-#                    name: minio
-#                    key: root-password
+              MINIO_ROOT_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: minio
+                    key: root-user
+              MINIO_ROOT_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: minio
+                    key: root-password
             args:
               - server
               - /data
