@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - ./bjw-s.yaml
   - ./weave-gitops.yaml
+  - ./bitnami.yaml
   - ./cilium.yaml
   - ./external-dns.yaml
   - ./ingress-nginx.yaml
