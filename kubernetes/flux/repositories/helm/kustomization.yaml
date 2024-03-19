@@ -11,3 +11,9 @@ resources:
   - ./metrics-server.yaml
   - ./openebs.yaml
   - ./stakater.yaml
+  - ./weave-gitops.yaml
+  - ./nfs-subdir0external-provisioner.yaml
+  - ./csi-driver-smb.yaml
+  - ./csi-driver-nfs.yaml
+  - ./mojo2600.yaml
+  - ./external-secrets.yaml
