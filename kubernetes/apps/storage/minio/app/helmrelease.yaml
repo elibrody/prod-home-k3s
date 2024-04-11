@@ -128,7 +128,7 @@ spec:
       data:
         enabled: true
         type: nfs
-        server: ${NAS_IP}
-        path: ${SECRET_NFS_MINIO}
+        server: "192.168.1.111"
+        path: "/mnt/user/k3s/dev/minio"
         globalMounts:
           - path: /data
