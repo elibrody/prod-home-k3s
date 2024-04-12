@@ -25,7 +25,7 @@ jobs:
       - name: Checkout Pull Request Branch
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_PAT }}
+          token: ${{ secrets.GH_PAT }}
           path: pull
 
       - name: Gather Images in Pull Request Branch
