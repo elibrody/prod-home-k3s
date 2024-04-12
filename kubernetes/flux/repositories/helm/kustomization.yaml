@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - ./bjw-s.yaml
   - ./weave-gitops.yaml
-  - ./bitnami.yaml
   - ./cilium.yaml
   - ./external-dns.yaml
   - ./ingress-nginx.yaml
@@ -13,8 +12,4 @@ resources:
   - ./metrics-server.yaml
   - ./openebs.yaml
   - ./stakater.yaml
-  - ./nfs-subdir-external-provisioner.yaml
-  - ./csi-driver-smb.yaml
-  - ./csi-driver-nfs.yaml
-  - ./mojo2600.yaml
   - ./external-secrets.yaml
