@@ -29,7 +29,6 @@ spec:
           nfsMount: "true"
         annotations:
           reloader.stakater.com/auto: "true"
-        replicas: 1
         containers:
           app:
             image:
