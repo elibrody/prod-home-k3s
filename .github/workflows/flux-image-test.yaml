@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "Flux Image Test"
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths: ["kubernetes/**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  extract-images:
+    name: Extract Images
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Setup Workflow Tools
+        shell: bash
+        run: brew install jo yq
+
+      - name: Checkout Pull Request Branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_PAT }}
+          path: pull
+
+      - name: Gather Images in Pull Request Branch
+        uses: docker://ghcr.io/allenporter/flux-local:v4.3.1
+        with:
+          args: >-
+            get cluster
+            --path /github/workspace/pull/kubernetes/flux
+            --enable-images
+            --output yaml
+            --output-file pull.yaml
+      - name: Filter Pull Request Branch Results
+        shell: bash
+        run: |
+          images=$(yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' pull.yaml | jo -a)
+          echo "images=${images}" >> $GITHUB_ENV
+
+  test-images:
+    if: ${{ env.images != '[]' }}
+    name: Test images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        images: ${{ fromJSON(env.images) }}
+      max-parallel: 4
+      fail-fast: false
+    steps:
+      - name: Test Images
+        run: docker pull ${{ matrix.images }}
+
+  test-images-success:
+    if: ${{ always() }}
+    needs: ["test-images"]
+    name: Test Images Successful
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        name: Check matrix status
+        run: exit 1
