@@ -3,13 +3,14 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./bjw-s.yaml
-  - ./weave-gitops.yaml
   - ./cilium.yaml
   - ./external-dns.yaml
+  - ./external-secrets.yaml
   - ./ingress-nginx.yaml
-  - ./k8s-gateway.yaml
   - ./jetstack.yaml
+  - ./k8s-gateway.yaml
+  - ./longhorn.yaml
   - ./metrics-server.yaml
   - ./openebs.yaml
   - ./stakater.yaml
-  - ./external-secrets.yaml
+  - ./weave-gitops.yaml
