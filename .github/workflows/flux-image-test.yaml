@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: "Flux Image Test"
 
 on:
@@ -14,14 +13,13 @@ jobs:
   extract-images:
     name: Extract Images
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
+    outputs:
+      images: ${{ steps.filter-images.outputs.images }}
     steps:
       - name: Setup Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
       - name: Setup Workflow Tools
-        shell: bash
         run: brew install jo yq
 
       - name: Checkout Pull Request Branch
@@ -39,19 +37,21 @@ jobs:
             --enable-images
             --output yaml
             --output-file pull.yaml
+
       - name: Filter Pull Request Branch Results
-        shell: bash
+        id: filter-images
         run: |
-          images=$(yq -r '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' pull.yaml | jo -a)
-          echo "images=${images}" >> $GITHUB_ENV
+          images=$(yq e '[.. | .images? | select(. != null)] | flatten | sort | unique | .[]' pull.yaml | jo -a)
+          echo "::set-output name=images::$images"
 
   test-images:
-    if: ${{ env.images != '[]' }}
+    if: ${{ needs.extract-images.outputs.images != '[]' }}
     name: Test images
     runs-on: ubuntu-latest
+    needs: extract-images
     strategy:
       matrix:
-        images: ${{ fromJSON(env.images) }}
+        images: ${{ fromJSON(needs.extract-images.outputs.images) }}
       max-parallel: 4
       fail-fast: false
     steps:
