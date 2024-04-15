@@ -3,9 +3,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: longhorn
+  name: backube
   namespace: flux-system
 spec:
-  interval: 30m
-  url: https://charts.longhorn.io
-  timeout: 3m
+  interval: 2h
+  url: https://backube.github.io/helm-charts/
