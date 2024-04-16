@@ -24,9 +24,6 @@ spec:
     remediation:
       strategy: rollback
       retries: 3
-    dependsOn:
-    - name: bitwarden-secrets-manager
-      namespace: external-secrets
   values:
     controller:
       serviceMonitor:
