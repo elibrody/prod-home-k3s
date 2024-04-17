@@ -16,3 +16,4 @@ resources:
   - ./weave-gitops.yaml
   - ./backube.yaml
   - ./piraeus.yaml
+  - ./netdata.yaml
