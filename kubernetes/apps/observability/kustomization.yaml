@@ -17,4 +17,4 @@ resources:
   # - ./thanos/ks.yaml
   # - ./unpoller/ks.yaml
   # - ./vector/ks.yaml
-  - ./netdata/ks.yaml
+#  - ./netdata/ks.yaml
