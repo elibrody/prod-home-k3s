@@ -52,15 +52,15 @@ spec:
                 enabled: true
     ingress:
       app:
-      enabled: true
-      className: internal
-        hosts:
-          - host: &host "netdata.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
+        enabled: true
+        className: internal
+          hosts:
+            - host: &host "netdata.${SECRET_DOMAIN}"
+              paths:
+                - path: /
+                  service:
+                    identifier: app
+                    port: http
       tls:
         - hosts:
             - *host
