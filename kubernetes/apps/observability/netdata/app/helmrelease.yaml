@@ -54,14 +54,15 @@ spec:
       app:
         ingressClassName: internal
         hosts:
-          - host: &host "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - host: &host "netdata.${SECRET_DOMAIN}"
             paths:
               - path: /
                 service:
                   identifier: app
                   port: http
-        tls:
-          - hosts: [*host]
+      tls:
+        - hosts:
+            - *host
     persistence:
       config:
         existingClaim: netdata
