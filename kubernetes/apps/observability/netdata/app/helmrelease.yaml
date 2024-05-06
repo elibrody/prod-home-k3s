@@ -51,13 +51,17 @@ spec:
                 enabled: true
     ingress:
       enabled: true
-      className: internal
+      ingressClassName: internal
       hosts:
         - host: &host "netdata.${SECRET_DOMAIN}"
           paths:
             - path: /
-              service:
-                port: http
+              pathType: ImplementationSpecific
+              backend:
+                service:
+                  name: app
+                  port:
+                    name: http
       tls:
         - hosts:
             - *host
