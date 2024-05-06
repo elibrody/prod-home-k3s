@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://lds-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
@@ -39,7 +38,7 @@ spec:
         containers:
           app:
             env:
-              TZ: ${TIMEZONE}
+              TZ: "${TIMEZONE}"
             image:
               repository: netdata/netdata
               tag: "v1.45.3"
@@ -51,16 +50,15 @@ spec:
               startup:
                 enabled: true
     ingress:
-      app:
-        enabled: true
-        className: internal
-          hosts:
-            - host: &host "netdata.${SECRET_DOMAIN}"
-              paths:
-                - path: /
-                  service:
-                    identifier: app
-                    port: http
+      enabled: true
+      className: internal
+      hosts:
+        - host: &host "netdata.${SECRET_DOMAIN}"
+          paths:
+            - path: /
+              service:
+                identifier: app
+                port: http
       tls:
         - hosts:
             - *host
