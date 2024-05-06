@@ -52,7 +52,8 @@ spec:
                 enabled: true
     ingress:
       app:
-        ingressClassName: internal
+      enabled: true
+      className: internal
         hosts:
           - host: &host "netdata.${SECRET_DOMAIN}"
             paths:
