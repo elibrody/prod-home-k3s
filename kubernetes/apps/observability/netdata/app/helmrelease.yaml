@@ -56,6 +56,7 @@ spec:
         - host: &host "netdata.${SECRET_DOMAIN}"
       paths:
         - path: /
+          pathType: Prefix
           backend:
           service:
             name: app
