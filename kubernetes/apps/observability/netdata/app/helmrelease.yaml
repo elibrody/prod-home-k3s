@@ -54,14 +54,14 @@ spec:
       ingressClassName: internal
       hosts:
         - host: &host "netdata.${SECRET_DOMAIN}"
-          paths:
-            - path: /
-              pathType: ImplementationSpecific
-              backend:
-                service:
-                  name: app
-                  port:
-                    name: http
+      paths:
+        - path: /
+          backend:
+          service:
+            name: app
+            port:
+              name: http
+
       tls:
         - hosts:
             - *host
