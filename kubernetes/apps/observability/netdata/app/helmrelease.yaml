@@ -1,11 +1,11 @@
----
-# yaml-language-server: $schema=https://lds-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: &app netdata
+  name: netdata
+  namespace: monitoring
 spec:
   interval: 30m
+  releaseName: netdata
   chart:
     spec:
       chart: netdata
@@ -18,49 +18,54 @@ spec:
   maxHistory: 3
 
   install:
+    createNamespace: true
     remediation:
       retries: 3
+
   upgrade:
     cleanupOnFail: true
     remediation:
-      strategy: rollback
       retries: 3
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
-    - name: volsync
-      namespace: storage
+
+  uninstall:
+    keepHistory: false
+
   values:
-    controllers:
-      netdata:
-        annotations:
-          reloader.stakater.com/auto: "true"
-        containers:
-          app:
-            env:
-              TZ: ${TIMEZONE}
-            image:
-              repository: netdata/netdata
-              tag: "v1.45.3"
-            probes:
-              liveness:
-                enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+    image:
+      repository: netdata/netdata
+      tag: "v1.45.3"
+
     ingress:
-      app:
-        className: internal
-        hosts:
-          - host: &host "netdata.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts: *host
-    persistence:
-      config:
-        existingClaim: netdata
+      enabled: true
+#      annotations:
+#        cert-manager.io/cluster-issuer: "letsencrypt-production"
+#        kubernetes.io/ingress.class: internal
+#        hajimari.io/enable: "true"
+#        hajimari.io/appName: "Net Data"
+#        hajimari.io/icon: mdi:console-network-outline
+#        hajimari.io/group: "monitoring"
+#        hajimari.io/instance: "admin"
+      path: /
+      pathType: Prefix
+      hosts:
+        - &host netdata.${SECRET_DOMAIN}
+
+      tls:
+        - hosts:
+            - *host
+
+    env:
+      TZ: ${TIMEZONE}
+
+    parent:
+      enabled: true
+      alarms:
+        storageclass: "ceph-block"
+      database:
+        storageclass: "ceph-block"
+
+    child:
+      enabled: false
+
+    k8sState:
+      enabled: false
