@@ -1,9 +1,9 @@
+---
 # yaml-language-server: $schema=https://lds-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: &app netdata
-  namespace: observability
 spec:
   interval: 30m
   chart:
@@ -38,7 +38,7 @@ spec:
         containers:
           app:
             env:
-              TZ: "${TIMEZONE}"
+              TZ: ${TIMEZONE}
             image:
               repository: netdata/netdata
               tag: "v1.45.3"
@@ -50,22 +50,17 @@ spec:
               startup:
                 enabled: true
     ingress:
-      enabled: true
-      ingressClassName: internal
-      hosts:
-        - host: &host netdata.${SECRET_DOMAIN}
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-          service:
-            name: app
-            port:
-              name: http
-
-      tls:
-        - hosts:
-            - *host
+      app:
+        className: internal
+        hosts:
+          - host: &host "netdata.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
+        tls:
+          - hosts: *host
     persistence:
       config:
         existingClaim: netdata
