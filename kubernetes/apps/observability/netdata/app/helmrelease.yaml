@@ -37,6 +37,7 @@ spec:
 
     ingress:
       enabled: true
+      className: internal
 #      annotations:
 #        cert-manager.io/cluster-issuer: "letsencrypt-production"
 #        kubernetes.io/ingress.class: internal
