@@ -5,7 +5,7 @@ metadata:
   name: &app uptimekuma
   namespace: flux-system
 spec:
-  targetNamespace: default
+  targetNamespace: observability
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

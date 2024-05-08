@@ -73,6 +73,6 @@ spec:
           - hosts: *host
     persistence:
       config:
-        existingClaim: uptimekuma
+        existingClaim: *app
         globalMounts:
           - path: /app/data
